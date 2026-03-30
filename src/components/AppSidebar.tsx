@@ -1,7 +1,7 @@
-import { LayoutDashboard, PlusCircle, Brain, Bell, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Brain, Bell, LogOut, Zap } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
-import { useTheme } from "@/lib/theme";
+import { useAuth } from "@/lib/auth";
 import {
   Sidebar,
   SidebarContent,
@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Add Expense", url: "/add-expense", icon: PlusCircle },
-  { title: "Insights", url: "/insights", icon: Brain },
+  { title: "AI Insights", url: "/insights", icon: Brain },
   { title: "Alerts", url: "/alerts", icon: Bell },
 ];
 
@@ -27,19 +27,21 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { theme, toggle } = useTheme();
+  const { signOut } = useAuth();
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r neon-border-cyan">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 py-4">
-            {!collapsed && (
-              <span className="text-lg font-bold tracking-tight text-primary">
-                FinAI
-              </span>
+            {!collapsed ? (
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-neon-cyan animate-pulse-neon" />
+                <span className="text-lg font-display font-bold neon-text-cyan">FINAI</span>
+              </div>
+            ) : (
+              <Zap className="h-5 w-5 text-neon-cyan animate-pulse-neon" />
             )}
-            {collapsed && <span className="text-lg font-bold text-primary">F</span>}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -49,11 +51,11 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end
-                      className="hover:bg-accent/50 transition-colors"
-                      activeClassName="bg-primary/10 text-primary font-medium"
+                      className="hover:bg-muted/50 transition-all duration-300"
+                      activeClassName="bg-neon-cyan/10 text-neon-cyan font-medium neon-border-cyan border-l-2"
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && <span className="text-sm">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -62,24 +64,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-3 space-y-2">
+      <SidebarFooter className="p-3">
         <Button
           variant="ghost"
           size={collapsed ? "icon" : "sm"}
-          onClick={toggle}
-          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-        >
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          {!collapsed && (theme === "dark" ? "Light Mode" : "Dark Mode")}
-        </Button>
-        <Button
-          variant="ghost"
-          size={collapsed ? "icon" : "sm"}
-          className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
-          onClick={() => window.location.href = "/"}
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive transition-colors"
+          onClick={signOut}
         >
           <LogOut className="h-4 w-4" />
-          {!collapsed && "Sign Out"}
+          {!collapsed && "Disconnect"}
         </Button>
       </SidebarFooter>
     </Sidebar>
