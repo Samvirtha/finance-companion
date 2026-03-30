@@ -65,7 +65,7 @@ export default function InsightsPage() {
             </div>
             <div className="text-center py-4">
               <Badge variant="secondary" className="text-lg px-6 py-2 font-semibold">
-                {userType === "Saver" && "💰"} {userType === "Spender" && "💸"} {userType === "Risky" && "⚠️"} {userType}
+                💰 {userType}
               </Badge>
               <p className="text-sm text-muted-foreground mt-3">
                 You consistently save more than you spend. Great financial discipline!
