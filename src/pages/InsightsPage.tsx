@@ -68,11 +68,7 @@ export default function InsightsPage() {
                 {userType === "Saver" && "💰"} {userType === "Spender" && "💸"} {userType === "Risky" && "⚠️"} {userType}
               </Badge>
               <p className="text-sm text-muted-foreground mt-3">
-                {userType === "Saver"
-                  ? "You consistently save more than you spend. Great financial discipline!"
-                  : userType === "Spender"
-                  ? "You tend to spend most of your income. Consider setting savings goals."
-                  : "Your spending patterns show some risky behavior. Review your habits."}
+                You consistently save more than you spend. Great financial discipline!
               </p>
             </div>
           </motion.div>
