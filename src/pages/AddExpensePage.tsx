@@ -12,107 +12,140 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "@/lib/mock-data";
-import { Check, DollarSign } from "lucide-react";
+import { categories, addExpense } from "@/lib/data";
+import { Check, DollarSign, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function AddExpensePage() {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [description, setDescription] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    toast.success("Expense added successfully!");
-    setTimeout(() => {
+  const mutation = useMutation({
+    mutationFn: addExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      toast.success("Expense logged to neural network");
       setAmount("");
       setCategory("");
       setDescription("");
-      setSubmitted(false);
-    }, 1500);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({
+      amount: parseFloat(amount),
+      category,
+      description: description || undefined,
+      date,
+    });
   };
 
   return (
     <DashboardLayout>
       <div className="max-w-lg mx-auto space-y-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Add Expense</h2>
-          <p className="text-sm text-muted-foreground">Track a new transaction</p>
+          <h2 className="text-2xl font-display font-bold tracking-tight neon-text-purple">Add Expense</h2>
+          <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Log new transaction to database</p>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card rounded-xl p-6"
+          className="neon-card neon-glow-purple border neon-border-purple p-6"
         >
-          {submitted ? (
+          {mutation.isSuccess ? (
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="flex flex-col items-center py-8 gap-3"
             >
-              <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
-                <Check className="h-6 w-6 text-success" />
+              <div className="h-14 w-14 rounded-full bg-neon-green/10 flex items-center justify-center neon-glow-cyan">
+                <Check className="h-7 w-7 text-neon-green" />
               </div>
-              <p className="font-medium">Expense Added!</p>
+              <p className="font-display text-sm neon-text-cyan uppercase">Transaction Logged</p>
+              <Button
+                variant="ghost"
+                className="text-xs font-mono text-muted-foreground"
+                onClick={() => mutation.reset()}
+              >
+                Add Another
+              </Button>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Amount</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">Amount</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neon-cyan" />
                   <Input
                     type="number"
                     step="0.01"
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="pl-10 bg-secondary/50 border-border/50 text-lg font-mono"
+                    className="pl-10 bg-muted/30 border-border/50 text-lg font-mono focus:border-neon-purple/50"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Category</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">Category</Label>
                 <Select value={category} onValueChange={setCategory} required>
-                  <SelectTrigger className="bg-secondary/50 border-border/50">
+                  <SelectTrigger className="bg-muted/30 border-border/50 font-mono text-sm">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-card border-border">
                     {categories.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                      <SelectItem key={c} value={c} className="font-mono text-sm">{c}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Date</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">Date</Label>
                 <Input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="bg-secondary/50 border-border/50"
+                  className="bg-muted/30 border-border/50 font-mono text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Description</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">Description</Label>
                 <Textarea
-                  placeholder="What was this expense for?"
+                  placeholder="Transaction details..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="bg-secondary/50 border-border/50 resize-none"
+                  className="bg-muted/30 border-border/50 resize-none font-mono text-sm"
                   rows={3}
                 />
               </div>
 
-              <Button type="submit" className="w-full">Add Expense</Button>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="w-full gap-2 font-display text-xs uppercase tracking-wider bg-neon-purple/90 text-secondary-foreground hover:bg-neon-purple neon-glow-purple transition-all"
+              >
+                {mutation.isPending ? (
+                  <div className="h-4 w-4 border-2 border-secondary-foreground/30 border-t-secondary-foreground rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Zap className="h-4 w-4" />
+                    Log Expense
+                  </>
+                )}
+              </Button>
             </form>
           )}
         </motion.div>
