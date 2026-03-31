@@ -47,25 +47,40 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          budget_limit: number | null
           created_at: string
           display_name: string | null
           id: string
+          monthly_income: number | null
+          preferred_currency: string | null
+          profile_completed: boolean | null
+          savings_goal: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          budget_limit?: number | null
           created_at?: string
           display_name?: string | null
           id?: string
+          monthly_income?: number | null
+          preferred_currency?: string | null
+          profile_completed?: boolean | null
+          savings_goal?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          budget_limit?: number | null
           created_at?: string
           display_name?: string | null
           id?: string
+          monthly_income?: number | null
+          preferred_currency?: string | null
+          profile_completed?: boolean | null
+          savings_goal?: number | null
           updated_at?: string
           user_id?: string
         }
