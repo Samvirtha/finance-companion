@@ -30,10 +30,8 @@ export default function LoginPage() {
 
     if (result.error) {
       setError(result.error.message);
-    } else if (isLogin) {
-      navigate("/dashboard");
     } else {
-      setError("Check your email to confirm your account, then sign in.");
+      navigate("/dashboard");
     }
   };
 
