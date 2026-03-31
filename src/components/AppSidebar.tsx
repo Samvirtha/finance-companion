@@ -1,6 +1,5 @@
-import { LayoutDashboard, PlusCircle, Brain, Bell, LogOut, Zap } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Brain, Bell, LogOut, Zap, User } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import {
   Sidebar,
@@ -21,12 +20,12 @@ const navItems = [
   { title: "Add Expense", url: "/add-expense", icon: PlusCircle },
   { title: "AI Insights", url: "/insights", icon: Brain },
   { title: "Alerts", url: "/alerts", icon: Bell },
+  { title: "Profile", url: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const { signOut } = useAuth();
 
   return (

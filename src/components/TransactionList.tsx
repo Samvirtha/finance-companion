@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight, ArrowDownRight, Trash2 } from "lucide-react";
+import { ArrowDownRight, Trash2 } from "lucide-react";
 import { type Expense, deleteExpense } from "@/lib/data";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 
 interface TransactionListProps {
   expenses: Expense[];
+  currency?: string;
 }
 
-export function TransactionList({ expenses }: TransactionListProps) {
+export function TransactionList({ expenses, currency = "$" }: TransactionListProps) {
   const queryClient = useQueryClient();
   const deleteMutation = useMutation({
     mutationFn: deleteExpense,
@@ -48,7 +49,7 @@ export function TransactionList({ expenses }: TransactionListProps) {
                 <p className="text-xs font-mono text-muted-foreground">{tx.category} · {tx.date}</p>
               </div>
               <span className="text-sm font-mono font-semibold text-foreground">
-                -${Number(tx.amount).toFixed(2)}
+                -{currency}{Number(tx.amount).toFixed(2)}
               </span>
               <Button
                 variant="ghost"
