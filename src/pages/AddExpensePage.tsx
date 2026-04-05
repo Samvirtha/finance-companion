@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categories, addExpense } from "@/lib/data";
+import { getPrediction } from "@/services/api";
 import { Check, DollarSign, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,8 @@ export default function AddExpensePage() {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [description, setDescription] = useState("");
+  const [result, setResult] = useState("");
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -32,6 +35,7 @@ export default function AddExpensePage() {
       setAmount("");
       setCategory("");
       setDescription("");
+      setResult("");
     },
     onError: (err: Error) => {
       toast.error(err.message);
@@ -48,12 +52,31 @@ export default function AddExpensePage() {
     });
   };
 
+  // 🔥 PREDICT FUNCTION + AUTO-FILL CATEGORY
+  const handlePredict = async () => {
+    try {
+      const res = await getPrediction(Number(amount));
+      console.log("API response:", res);
+
+      setResult(res.prediction);
+      setCategory(res.prediction); // ✅ auto-fill category
+      toast.success(`Prediction: ${res.prediction}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Prediction failed");
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-lg mx-auto space-y-6">
         <div>
-          <h2 className="text-2xl font-display font-bold tracking-tight neon-text-purple">Add Expense</h2>
-          <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Log new transaction to database</p>
+          <h2 className="text-2xl font-display font-bold tracking-tight neon-text-purple">
+            Add Expense
+          </h2>
+          <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+            Log new transaction to database
+          </p>
         </div>
 
         <motion.div
@@ -70,7 +93,9 @@ export default function AddExpensePage() {
               <div className="h-14 w-14 rounded-full bg-neon-green/10 flex items-center justify-center neon-glow-cyan">
                 <Check className="h-7 w-7 text-neon-green" />
               </div>
-              <p className="font-display text-sm neon-text-cyan uppercase">Transaction Logged</p>
+              <p className="font-display text-sm neon-text-cyan uppercase">
+                Transaction Logged
+              </p>
               <Button
                 variant="ghost"
                 className="text-xs font-mono text-muted-foreground"
@@ -81,8 +106,11 @@ export default function AddExpensePage() {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Amount */}
               <div className="space-y-2">
-                <Label className="text-xs font-mono text-muted-foreground uppercase">Amount</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">
+                  Amount
+                </Label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neon-cyan" />
                   <Input
@@ -97,22 +125,30 @@ export default function AddExpensePage() {
                 </div>
               </div>
 
+              {/* Category */}
               <div className="space-y-2">
-                <Label className="text-xs font-mono text-muted-foreground uppercase">Category</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">
+                  Category
+                </Label>
                 <Select value={category} onValueChange={setCategory} required>
                   <SelectTrigger className="bg-muted/30 border-border/50 font-mono text-sm">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border">
                     {categories.map((c) => (
-                      <SelectItem key={c} value={c} className="font-mono text-sm">{c}</SelectItem>
+                      <SelectItem key={c} value={c} className="font-mono text-sm">
+                        {c}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
+              {/* Date */}
               <div className="space-y-2">
-                <Label className="text-xs font-mono text-muted-foreground uppercase">Date</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">
+                  Date
+                </Label>
                 <Input
                   type="date"
                   value={date}
@@ -121,8 +157,11 @@ export default function AddExpensePage() {
                 />
               </div>
 
+              {/* Description */}
               <div className="space-y-2">
-                <Label className="text-xs font-mono text-muted-foreground uppercase">Description</Label>
+                <Label className="text-xs font-mono text-muted-foreground uppercase">
+                  Description
+                </Label>
                 <Textarea
                   placeholder="Transaction details..."
                   value={description}
@@ -132,19 +171,17 @@ export default function AddExpensePage() {
                 />
               </div>
 
-              <Button
-                type="submit"
-                disabled={mutation.isPending}
-                className="w-full gap-2 font-display text-xs uppercase tracking-wider bg-neon-purple/90 text-secondary-foreground hover:bg-neon-purple neon-glow-purple transition-all"
-              >
-                {mutation.isPending ? (
-                  <div className="h-4 w-4 border-2 border-secondary-foreground/30 border-t-secondary-foreground rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Zap className="h-4 w-4" />
-                    Log Expense
-                  </>
-                )}
+              {/* 🔥 PREDICT BUTTON */}
+              <Button type="button" onClick={handlePredict}>
+                Predict Category
+              </Button>
+
+              {/* 🔥 SIMPLE RESULT DISPLAY (YOUR VERSION) */}
+              {result && <p>{result}</p>}
+
+              {/* ✅ SUBMIT BUTTON */}
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "Loading..." : "Log Expense"}
               </Button>
             </form>
           )}
