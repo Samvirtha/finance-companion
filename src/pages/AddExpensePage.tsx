@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { getSpendingStatus } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -26,7 +27,7 @@ export default function AddExpensePage() {
   const [result, setResult] = useState("");
 
   const queryClient = useQueryClient();
-
+  
   const mutation = useMutation({
     mutationFn: addExpense,
     onSuccess: () => {

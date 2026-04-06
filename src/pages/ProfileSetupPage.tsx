@@ -18,7 +18,6 @@ export default function ProfileSetupPage() {
   const [savingsGoal, setSavingsGoal] = useState("");
   const [budgetLimit, setBudgetLimit] = useState("");
   const [currency, setCurrency] = useState("USD");
-
   const mutation = useMutation({
     mutationFn: updateProfile,
     onSuccess: () => {
@@ -28,7 +27,10 @@ export default function ProfileSetupPage() {
     },
     onError: (err: Error) => toast.error(err.message),
   });
-
+localStorage.setItem("monthlyIncome", monthlyIncome);
+localStorage.setItem("savingsGoal", savingsGoal);
+localStorage.setItem("budgetLimit", budgetLimit);
+localStorage.setItem("currency", currency);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate({
